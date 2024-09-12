@@ -1,8 +1,12 @@
+config:
+  file:
+    path: "config.json"
+
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/mydb
-    username: myuser
-    password: mypassword
+    url: ""
+    username: ""
+    password: ""
   jpa:
     hibernate:
       ddl-auto: update
