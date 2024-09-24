@@ -1,6 +1,10 @@
 config:
   file:
     path: "config.json"
+server:
+  error:
+    include-message: always
+    include-binding-errors: always
 
 spring:
   datasource:

@@ -28,9 +28,10 @@ public class ConfigInitializer implements ApplicationContextInitializer<Configur
             System.setProperty("POSTGRES_USER", configMap.get("postgres.user"));
             System.setProperty("POSTGRES_PASSWORD", configMap.get("postgres.password"));
 
-            System.setProperty("url", configMap.get("url"));
-            System.setProperty("username", configMap.get("username"));
-            System.setProperty("password", configMap.get("password"));
+            // Debug output
+            System.out.println("Datasource URL: " + System.getProperty("db.datasource.url"));
+            System.out.println("Datasource Username: " + System.getProperty("db.datasource.username"));
+
 
         } catch (IOException e) {
             throw new RuntimeException("Failed to load config.json", e);

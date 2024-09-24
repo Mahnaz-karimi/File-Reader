@@ -2,6 +2,7 @@ version: '3'
 services:
   db:
     image: postgres:13
+    container_name: postgres-db
     environment:
       POSTGRES_DB: $${postgres.db}
       POSTGRES_USER: $${postgres.user}

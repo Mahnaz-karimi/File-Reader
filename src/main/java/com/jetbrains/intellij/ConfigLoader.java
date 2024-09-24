@@ -18,9 +18,10 @@ public class ConfigLoader {
     private String configFilePath;
 
     @PostConstruct
-    public Map<String, String> loadConfig() throws IOException {
+    public void loadConfig() throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         Resource resource = new ClassPathResource(configFilePath);
+
         if (!resource.exists()) {
             throw new FileNotFoundException("Config file not found at: " + configFilePath);
         }
@@ -35,12 +36,6 @@ public class ConfigLoader {
         System.setProperty("POSTGRES_USER", configMap.get("postgres.user"));
         System.setProperty("POSTGRES_PASSWORD", configMap.get("postgres.password"));
 
-        System.setProperty("url", configMap.get("url"));
-        System.setProperty("username", configMap.get("username"));
-        System.setProperty("password", configMap.get("password"));
-
-        System.out.println("Loaded config: " + configMap);
-
-        return configMap;  // Returnér bean (map af konfigurationsdata)
+        // System.out.println("Loaded config: " + configMap);
     }
 }
