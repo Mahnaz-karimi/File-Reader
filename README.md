@@ -2,11 +2,9 @@
 
 ### Using:
 
- >> - Java SpringBoot  
- 
- >>- PostgreSQL
- 
- >>- Docker 
+- Java SpringBoot  
+- PostgreSQL
+- Docker 
  
 
 
