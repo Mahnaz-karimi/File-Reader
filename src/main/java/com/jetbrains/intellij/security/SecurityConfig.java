@@ -50,8 +50,14 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(httpForm ->{
                     httpForm.loginPage("/req/login").permitAll();
-                    httpForm.defaultSuccessUrl("/index");
+                    httpForm.defaultSuccessUrl("/upload");
 
+                })
+                .logout(logout -> {
+                    logout.logoutUrl("/logout")
+                            .logoutSuccessUrl("/req/login?logout")
+                            .invalidateHttpSession(true)
+                            .deleteCookies("JSESSIONID");
                 })
 
                 .authorizeHttpRequests(registry ->{

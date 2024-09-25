@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Upload STL File</title>
+</head>
+<body>
+<h1>Upload STL File</h1>
+<form action="#" th:action="@{/upload}" method="post" enctype="multipart/form-data">
+  <input type="file" name="file" required />
+  <button type="submit">Upload</button>
+</form>
+<p th:text="${message}"></p>
+</body>
+<form th:action="@{/logout}" method="post">
+  <button type="submit">Log Out</button>
+</form>
+</html>
