@@ -38,3 +38,5 @@ out/
 P-README.md
 config.json
 Docker-JsonREADME.md
+application.yml
+Cube_3d_printing_sample.stl

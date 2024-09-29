@@ -1,26 +1,29 @@
 package com.jetbrains.intellij.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.GenericGenerator;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Data
 @NoArgsConstructor
 public class StlFile {
     @Id
-    @GeneratedValue(generator = "uuid")
-    @GenericGenerator(name = "uuid", strategy = "uuid2")
-    private String id;
-    private String fileName;    @Lob
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String fileName;
+    @Lob
     private byte[] data;
+    private LocalDateTime createdAt;
 
     public StlFile(String fileName, byte[] data) {
         this.fileName = fileName;
         this.data = data;
+    }
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
     }
 }
