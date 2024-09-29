@@ -26,5 +26,10 @@ public class UserController {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
-
+    @GetMapping("/users/{id}") public AppUser getStudent(@PathVariable long id){
+        AppUser appUser = userRepository.findById(id).get(); return appUser;
+    }
+    @DeleteMapping("/users/delete/{id}") public void removeStudent(@PathVariable long id){
+        AppUser appUser = userRepository.findById(id).get(); userRepository.delete(appUser);
+    }
 }
