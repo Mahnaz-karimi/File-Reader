@@ -5,7 +5,11 @@ server:
   error:
     include-message: always
     include-binding-errors: always
-
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/mydb
@@ -23,6 +27,11 @@ spring:
       file-size-threshold: 2KB
       max-file-size: 200MB
       max-request-size: 200MB
+  http:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
 
 logging:
   level:

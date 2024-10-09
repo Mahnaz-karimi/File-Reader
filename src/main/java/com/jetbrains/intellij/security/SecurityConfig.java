@@ -17,6 +17,8 @@ import org.springframework.security.web.SecurityFilterChain;
 
 
 import lombok.AllArgsConstructor;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @AllArgsConstructor
@@ -31,6 +33,15 @@ public class SecurityConfig {
         return appUserService;
     }
 
+    @Bean
+    public WebMvcConfigurer corsConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/**").allowedOrigins("*");
+            }
+        };
+    }
     @Bean
     public AuthenticationProvider authenticationProvider(){
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
@@ -51,6 +62,7 @@ public class SecurityConfig {
                 .formLogin(httpForm ->{
                     httpForm.loginPage("/req/login").permitAll();
                     httpForm.defaultSuccessUrl("/upload");
+                    httpForm.defaultSuccessUrl("/string-check/check");
 
                 })
                 .logout(logout -> {
@@ -61,7 +73,9 @@ public class SecurityConfig {
                 })
 
                 .authorizeHttpRequests(registry ->{
-                    registry.requestMatchers("/req/signup", "/css/**", "/js/**", "/upload", "/getStlFile").permitAll();
+                    // Tillad uautentificeret adgang til de
+                    registry.requestMatchers("/req/signup","/string-check/check", "/css/**", "/js/**", "/upload", "/getStlFile").permitAll();
+                    // Kræv login for alle andre anmodninger
                     registry.anyRequest().authenticated();
                 })
                 .build();
