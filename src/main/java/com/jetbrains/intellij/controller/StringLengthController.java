@@ -1,39 +1,42 @@
 package com.jetbrains.intellij.controller;
 
-import com.jetbrains.intellij.entity.LengthRequest;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Arrays;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@RestController
+@Controller
 @RequestMapping("/string-check")
 public class StringLengthController {
     private static final Logger logger = LoggerFactory.getLogger(StringLengthController.class);
+
+    @GetMapping("/string-check.html")
+    public String stringCheckPage() {
+        return "string-check"; // returner navn på Thymeleaf-skabelonen uden ".html"
+    }
     @PostMapping("/check")
-    public Response  sumOfSubstringsLength(@RequestBody LengthRequest request) {
-
-        logger.info("Received request: {}", request);
-        List<String> strings = request.getStrings();
-        int maxLength = request.getMaxLength();
-
+    public String sumOfSubstringsLength(@RequestParam("strings") String strings,
+                                        @RequestParam("maxLength") int maxLength,
+                                        Model model) {
+        List<String> stringList = Arrays.asList(strings.split(","));
         int totalLength = 0;
 
         // Beregn den samlede længde af alle strenge, inklusive mellemrum
-        for (String str : strings) {
-            // Tæl længden af strengen inklusiv mellemrum
-            totalLength += str.length();
+        for (String str : stringList) {
+            totalLength += str.trim().length();
             logger.info("Streng: {}, Længde: {}", str, str.length());
-            // Hvis det samlede antal overstiger den givne grænse, returner false
             if (totalLength > maxLength) {
-                return new Response(false, "Samlet længde overstiger maxLength.");
+                model.addAttribute("result", "Samlet længde overstiger maxLength.");
+                return "result"; // returner "result" skabelonen
             }
         }
         // Hvis det samlede antal er mindre eller lig med maxLength, returner true
-        return new Response(true, "Tilladt: samlet længde er inden for grænsen.");
+        model.addAttribute("result", "Tilladt: samlet længde er inden for grænsen.");
+        return "result";
     }
 
 

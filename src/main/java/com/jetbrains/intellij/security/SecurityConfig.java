@@ -74,7 +74,7 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(registry ->{
                     // Tillad uautentificeret adgang til de
-                    registry.requestMatchers("/req/signup","/string-check/check", "/css/**", "/js/**", "/upload", "/getStlFile").permitAll();
+                    registry.requestMatchers("/req/signup", "/string-check/check", "/css/**", "/js/**", "/upload", "/getStlFile").permitAll();
                     // Kræv login for alle andre anmodninger
                     registry.anyRequest().authenticated();
                 })

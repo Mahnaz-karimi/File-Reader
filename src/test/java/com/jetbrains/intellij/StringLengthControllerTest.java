@@ -1,24 +1,18 @@
 package com.jetbrains.intellij;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jetbrains.intellij.controller.StringLengthController;
-import com.jetbrains.intellij.controller.UserController;
-import com.jetbrains.intellij.entity.LengthRequest;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
-
-import java.util.List;
-
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 @WebMvcTest(StringLengthController.class)
 @AutoConfigureMockMvc
@@ -28,39 +22,30 @@ public class StringLengthControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    private ObjectMapper objectMapper;
-
-    @BeforeEach
-    public void setup() {
-        objectMapper = new ObjectMapper();
+    @Test
+    public void testStringCheckPage() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/string-check/string-check.html"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("string-check")); // Kontroller at view'et har korrekt navn
     }
 
     @Test
-    public void testValidLengthRequest() throws Exception {
-        LengthRequest request = new LengthRequest();
-        request.setStrings(List.of("Foerste element", "Andet element", "Tredje element"));
-        request.setMaxLength(100);
-
+    public void testSumOfSubstringsLength_ValidLength() throws Exception {
         mockMvc.perform(post("/string-check/check")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                        .param("strings", "first,second,third")
+                        .param("maxLength", "50"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.allowed").value(true))
-                .andExpect(jsonPath("$.message").value("Tilladt: samlet længde er inden for grænsen."));
+                .andExpect(view().name("result")) // Kontroller view-navnet
+                .andExpect(model().attribute("result", "Tilladt: samlet længde er inden for grænsen."));
     }
 
     @Test
-    public void testExceedingLengthRequest() throws Exception {
-        LengthRequest request = new LengthRequest();
-        request.setStrings(List.of("Foerste element", "Andet element", "Tredje element"));
-        request.setMaxLength(10); // Set a maxLength that will be exceeded
-
+    public void testSumOfSubstringsLength_ExceedsLength() throws Exception {
         mockMvc.perform(post("/string-check/check")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                        .param("strings", "first,second,third,veryverylongstring")
+                        .param("maxLength", "20"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.allowed").value(false))
-                .andExpect(jsonPath("$.message").value("Samlet længde overstiger maxLength."));
+                .andExpect(view().name("result")) // Kontroller view-navnet
+                .andExpect(model().attribute("result", "Samlet længde overstiger maxLength."));
     }
 }

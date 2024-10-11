@@ -5,23 +5,21 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import java.util.List;
 
 public class LengthRequest {
-    private List<String> strings;
+    private String strings;
     private int maxLength;
-    @JsonCreator
-    public LengthRequest(List<String> strings, int maxLength) {
+
+    public LengthRequest() {}
+
+    public LengthRequest(String strings, int maxLength) {
         this.strings = strings;
         this.maxLength = maxLength;
     }
 
-    public LengthRequest() {
-
-    }
-
-    public List<String> getStrings() {
+    public String getStrings() {
         return strings;
     }
 
-    public void setStrings(List<String> strings) {
+    public void setStrings(String strings) {
         this.strings = strings;
     }
 
