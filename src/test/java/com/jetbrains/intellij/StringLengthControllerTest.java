@@ -22,9 +22,10 @@ public class StringLengthControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
     @Test
     public void testStringCheckPage() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/string-check/string-check.html"))
+        mockMvc.perform(MockMvcRequestBuilders.get("/string-check/check"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("string-check")); // Kontroller at view'et har korrekt navn
     }

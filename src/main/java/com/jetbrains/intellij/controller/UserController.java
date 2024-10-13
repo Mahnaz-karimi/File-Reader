@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController
+@RestController // restcontroller burges når sataene sendes som en JSON-struktur (eller XML) i request-bodyen.
 public class UserController {
     @Autowired
     private UserRepository userRepository;

@@ -9,12 +9,12 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Controller
+@Controller // Bruges til at hente data fra URL-parametre eller formdata
 @RequestMapping("/string-check")
 public class StringLengthController {
     private static final Logger logger = LoggerFactory.getLogger(StringLengthController.class);
 
-    @GetMapping("/string-check.html")
+    @GetMapping("/check")
     public String stringCheckPage() {
         return "string-check"; // returner navn på Thymeleaf-skabelonen uden ".html"
     }
@@ -37,26 +37,6 @@ public class StringLengthController {
         // Hvis det samlede antal er mindre eller lig med maxLength, returner true
         model.addAttribute("result", "Tilladt: samlet længde er inden for grænsen.");
         return "result";
-    }
-
-
-    // Klasse til at holde svar-data
-    public static class Response {
-        private boolean allowed;
-        private String message;
-
-        public Response(boolean allowed, String message) {
-            this.allowed = allowed;
-            this.message = message;
-        }
-
-        public boolean isAllowed() {
-            return allowed;
-        }
-
-        public String getMessage() {
-            return message;
-        }
     }
 
 }

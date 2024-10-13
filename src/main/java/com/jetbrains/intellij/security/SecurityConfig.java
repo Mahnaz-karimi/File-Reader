@@ -58,11 +58,10 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception{
         return httpSecurity
-                .csrf(AbstractHttpConfigurer::disable)
+                .csrf(AbstractHttpConfigurer::disable) // Deaktiver CSRF for simpelhed
                 .formLogin(httpForm ->{
                     httpForm.loginPage("/req/login").permitAll();
-                    httpForm.defaultSuccessUrl("/upload");
-                    httpForm.defaultSuccessUrl("/string-check/check");
+                    httpForm.defaultSuccessUrl("/upload", true);  // Standard side efter login
 
                 })
                 .logout(logout -> {
@@ -71,12 +70,22 @@ public class SecurityConfig {
                             .invalidateHttpSession(true)
                             .deleteCookies("JSESSIONID");
                 })
+                .authorizeHttpRequests(registry -> {
+                    // Tillad uautentificeret adgang til specifikke ruter
+                    registry.requestMatchers(
+                            "/req/signup",
+                            "/string-check/check",
+                            "/css/**",
+                            "/js/**",
+                            "/upload",
+                            "/getStlFile",
+                            "/req/login"
+                    ).permitAll();
 
-                .authorizeHttpRequests(registry ->{
-                    // Tillad uautentificeret adgang til de
-                    registry.requestMatchers("/req/signup", "/string-check/check", "/css/**", "/js/**", "/upload", "/getStlFile").permitAll();
-                    // Kræv login for alle andre anmodninger
-                    registry.anyRequest().authenticated();
+                    // Kræv autorisation for /users
+                    registry.requestMatchers("/users/**").authenticated();
+                    // Alle andre ruter tillades uden autentificering
+                    registry.anyRequest().permitAll();
                 })
                 .build();
     }
