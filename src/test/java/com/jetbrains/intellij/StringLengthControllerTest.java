@@ -15,9 +15,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 @WebMvcTest(StringLengthController.class)
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc  // bruges til at simulere HTTP-forespørgsler til controlleren
 @TestPropertySource(locations = "classpath:application-test.yml")
-@Import(TestSecurityConfig.class)
+@Import(TestSecurityConfig.class) //  Importerer en test-specifik sikkerhedskonfiguration, f.eks. for at deaktivere autentificering i tests.
 public class StringLengthControllerTest {
 
     @Autowired
