@@ -1,9 +1,12 @@
 package com.jetbrains.intellij.controller;
 
 
+import com.jetbrains.intellij.entity.StlFile;
 import com.jetbrains.intellij.service.StlFileService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -12,11 +15,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.util.Base64;
-import java.util.Optional;
 
 @Controller
 public class StlFileController {
@@ -37,41 +38,58 @@ public class StlFileController {
         }
 
         try {
-            System.out.println("Uploading file: " + file.getOriginalFilename()); // Debug
+            System.out.println("Uploading file: " + file.getOriginalFilename());
             stlFileService.saveStlFile(file);
+
+            // Bekræft upload ved at hente den seneste STL-fil
+            StlFile latestStlFile = stlFileService.getLatestStlFileFromDatabase();
+            if (latestStlFile != null) {
+                System.out.println("Uploaded file name: " + latestStlFile.getFileName());
+            } else {
+                System.out.println("No file found in the database.");
+            }
+
             model.addAttribute("message", "STL file uploaded successfully!");
         } catch (IOException e) {
             model.addAttribute("message", "Failed to upload STL file: " + e.getMessage());
         }
-        return "upload";  // Gå tilbage til upload-siden
-    }
-    @GetMapping("/getStlFile")
-    public ResponseEntity<byte[]> getStlFile() {
-        byte[] stlFileData = stlFileService.getLatestStlFileFromDatabase();
-        if (stlFileData != null) {
-            System.out.println("STL file found, size: " + stlFileData.length);
-            return ResponseEntity.ok()
-                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"latest.stl\"")
-                    .body(stlFileData);
-        } else {
-            System.out.println("No STL file found in the database.");
-            return ResponseEntity.notFound().build();
-        }
+        return "upload";
     }
 
-    @GetMapping("/")
-    public String index(Model model) {
-        byte[] latestStlFile = stlFileService.getLatestStlFileFromDatabase();
-        if (latestStlFile != null) {
-            System.out.println("STL file found, size: " + latestStlFile.length);
-            // Konverter byte[] til base64-streng
-            String base64Image = Base64.getEncoder().encodeToString(latestStlFile);
-            model.addAttribute("latestStlFile", "data:image/png;base64," + base64Image);  // Sørg for, at det er en gyldig MIME-type
+    @GetMapping("/getStlFile")
+    public String  getStlFile(Model model) {
+        // Hent STL-fil fra databasen
+        StlFile latestStlFile  = stlFileService.getLatestStlFileFromDatabase();
+
+        if (latestStlFile  != null) {
+            // Hvis STL-filen findes, gem data i model for senere brug i HTML
+            System.out.println("STL file data: " + (latestStlFile .getFileName()));
+            System.out.println("STL file data length: " + latestStlFile.getData().length);
+            System.out.println("STL File Data (Base64): " + Base64.getEncoder().encodeToString(latestStlFile.getData()));
+
+            // Hvis STL-filen findes, gem data i model for senere brug i HTML
+            model.addAttribute("stlFile", latestStlFile);
+
+            byte[] data = latestStlFile.getData();
+            String base64Encoded = Base64.getEncoder().encodeToString(data);
+            model.addAttribute("stlFileData", base64Encoded);
+
+
         } else {
-            System.out.println("No STL file found in the controller.");
-            model.addAttribute("latestStlFile", null);
+            model.addAttribute("error", "Ingen STL-fil fundet i databasen.");
         }
-        return "upload"; // Din HTML-fil hedder upload.html
+
+        return "stl"; // Returner navnet på Thymeleaf-siden (stl.html)
     }
+
+    @GetMapping("/showStlViewer")
+    public String showStlViewer() {
+        return "stlStatic.html";  // Returnerer stl.html (uden filtypenavnet) fra templates-mappen
+    }
+
+    @GetMapping("/testConnection")
+    public ResponseEntity<String> testConnection() {
+        return ResponseEntity.ok("Database connection is working!");
+    }
+
 }

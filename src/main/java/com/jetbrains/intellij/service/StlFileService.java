@@ -9,7 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Optional;
-
+import org.springframework.transaction.annotation.Transactional;
 @Service
 public class StlFileService {
     @Autowired
@@ -23,12 +23,13 @@ public class StlFileService {
         stlFileRepository.save(stlFile);
     }
     // Metode til at hente sidste STL-fil fra databasen
-    public byte[] getLatestStlFileFromDatabase() {
+    @Transactional // Sørg for, at der er en transaktion
+    public StlFile getLatestStlFileFromDatabase() {
         try {
             Optional<StlFile> optionalStlFile = stlFileRepository.findTopByOrderByCreatedAtDesc();
             if (optionalStlFile.isPresent()) {
                 System.out.println("STL file found: " + optionalStlFile.get().getFileName());
-                return optionalStlFile.get().getData(); // Hent binære data fra STL-filen
+                return optionalStlFile.get(); // Returner hele StlFile-objektet
             } else {
                 System.out.println("No STL file found in the database.");
                 throw new RuntimeException("STL-fil ikke fundet");
@@ -39,4 +40,9 @@ public class StlFileService {
         }
     }
 
+    @Transactional(readOnly = true)
+    public StlFile getStlFileById(Long id) {
+        return stlFileRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("STL-fil ikke fundet med ID: " + id));
+    }
 }

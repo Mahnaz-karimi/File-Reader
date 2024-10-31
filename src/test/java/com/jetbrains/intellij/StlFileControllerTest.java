@@ -61,25 +61,4 @@ public class StlFileControllerTest {
                 .andExpect(model().attribute("message", "Please upload a valid STL file."))
                 .andExpect(view().name("upload"));
     }
-
-    @Test
-    public void testGetStlFile_Success() throws Exception {
-        byte[] stlFileData = "stl data".getBytes(); // Simuleret STL-fil-data
-        when(stlFileService.getLatestStlFileFromDatabase()).thenReturn(stlFileData);
-
-        mockMvc.perform(get("/getStlFile"))
-                .andExpect(status().isOk())
-                .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"latest.stl\""))
-                // Brug contentTypeCompatibleWith for at ignorere charset
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_OCTET_STREAM))
-                .andExpect(content().bytes(stlFileData));  // Sammenlign med forventet bytearray
-    }
-
-    @Test
-    public void testGetStlFile_NotFound() throws Exception {
-        when(stlFileService.getLatestStlFileFromDatabase()).thenReturn(null);
-
-        mockMvc.perform(get("/getStlFile"))
-                .andExpect(status().isNotFound());
-    }
 }

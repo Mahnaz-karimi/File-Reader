@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STL Viewer</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.rawgit.com/mrdoob/three.js/r128/examples/js/loaders/STLLoader.js"></script>
+</head>
+<body>
+<h1>STL File Details</h1>
+<div th:if="${stlFileData != null}">
+    <h2>STL Filnavn: <span th:text="${stlFile.fileName}"></span></h2>
+    <div id="stlFileData" th:text="${stlFileData}"></div>
+
+    <h2>STL Fil er tilgængelig</h2>
+    <div id="viewer" style="width: 100%; height: 500px;"></div>
+</div>
+<div th:if="${stlFileData == null}">
+    <p>Ingen STL-fil fundet.</p>
+</div>
+
+<script>
+    // Opret en Three.js scene
+    var scene = new THREE.Scene();
+    var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    var renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.getElementById('viewer').appendChild(renderer.domElement);
+
+    // Tilføj lys til scenen for bedre synlighed
+    var ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    scene.add(ambientLight);
+
+    var directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+    directionalLight.position.set(0, 1, 1).normalize();
+    scene.add(directionalLight);
+
+    // Hent Base64-data og konverter til binary buffer
+    const base64String = document.getElementById('stlFileData').innerText;
+    const binaryString = atob(base64String);
+    const len = binaryString.length;
+    const bytes = new Uint8Array(len);
+
+    for (let i = 0; i < len; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+    }
+
+    // Brug STLLoader til at parse bytes
+    var loader = new THREE.STLLoader();
+    var geometry = loader.parse(bytes.buffer); // Brug arraybufferen direkte
+    var material = new THREE.MeshLambertMaterial({ color: 0x00ff00 }); // Grønt materiale
+    var mesh = new THREE.Mesh(geometry, material);
+    scene.add(mesh);
+
+    // Juster kameraets position
+    camera.position.z = 50;
+
+    function animate() {
+        requestAnimationFrame(animate);
+        mesh.rotation.x += 0.01; // Rotate mesh for visual feedback
+        mesh.rotation.y += 0.01;
+        renderer.render(scene, camera);
+    }
+    animate();
+
+    // Håndter vinduets størrelsesændringer
+    window.addEventListener('resize', function() {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+</script>
+</body>
+</html>
