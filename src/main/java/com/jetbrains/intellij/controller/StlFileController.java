@@ -65,8 +65,6 @@ public class StlFileController {
             // Hvis STL-filen findes, gem data i model for senere brug i HTML
             System.out.println("STL file data: " + (latestStlFile .getFileName()));
             System.out.println("STL file data length: " + latestStlFile.getData().length);
-            System.out.println("STL File Data (Base64): " + Base64.getEncoder().encodeToString(latestStlFile.getData()));
-
             // Hvis STL-filen findes, gem data i model for senere brug i HTML
             model.addAttribute("stlFile", latestStlFile);
 
